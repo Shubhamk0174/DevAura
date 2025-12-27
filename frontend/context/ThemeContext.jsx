@@ -3,17 +3,17 @@
  * Manages theme state and provides theme values throughout the app
  */
 
-import React, { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 import { useColorScheme as useSystemColorScheme } from 'react-native';
 import {
+  borderRadius,
   darkTheme,
-  lightTheme,
   fonts,
   fontSizes,
   fontWeights,
+  lightTheme,
   lineHeights,
-  spacing,
-  borderRadius
+  spacing
 } from '../utils/theme';
 
 const ThemeContext = createContext(undefined);

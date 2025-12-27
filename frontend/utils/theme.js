@@ -29,6 +29,10 @@ export const lightTheme = {
   textSecondary: '#687076',
   textLink: '#0a7ea4',
 
+  // Button text colors
+  buttonText: '#fff',
+  buttonTextSecondary: '#11181C',
+
   // Icon colors
   icon: '#687076',
   iconActive: '#0a7ea4',
@@ -67,6 +71,10 @@ export const darkTheme = {
   text: '#ECEDEE',
   textSecondary: '#9BA1A6',
   textLink: '#4fc3f7',
+
+  // Button text colors
+  buttonText: '#151718',
+  buttonTextSecondary: '#ECEDEE',
 
   // Icon colors
   icon: '#9BA1A6',

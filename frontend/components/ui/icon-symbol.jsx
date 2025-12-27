@@ -1,18 +1,20 @@
-// Fallback for using MaterialIcons on Android and web.
+// Fallback for using Ionicons on Android and web.
 
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const MAPPING = {
   'house.fill': 'home',
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
-  'chevron.right': 'chevron-right',
+  'chevron.right': 'chevron-forward',
+  'person.fill': 'person',
+  'chatbubble.fill': 'chatbubble',
 };
 
 /**
- * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.
+ * An icon component that uses native SF Symbols on iOS, and Ionicons on Android and web.
  * This ensures a consistent look across platforms, and optimal resource usage.
- * Icon `name`s are based on SF Symbols and require manual mapping to Material Icons.
+ * Icon `name`s are based on SF Symbols and require manual mapping to Ionicons.
  */
 export function IconSymbol({
   name,
@@ -20,5 +22,5 @@ export function IconSymbol({
   color,
   style,
 }) {
-  return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} />;
+  return <Ionicons color={color} size={size} name={MAPPING[name]} style={style} />;
 }
