@@ -1,14 +1,26 @@
 import { auth } from "@/lib/firebase";
+import {
+  createUserProfile,
+  ensureUserProfile,
+  getPublicProfile,
+  getUserProfile,
+  updatePublicProfile as updatePublicProfileService,
+  updateUserProfile as updateUserProfileService
+} from "@/lib/firestoreService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
-    createUserWithEmailAndPassword,
-    onAuthStateChanged,
-    sendEmailVerification,
-    signInWithEmailAndPassword,
-    signOut,
-    updateProfile
+  createUserWithEmailAndPassword,
+  EmailAuthProvider,
+  onAuthStateChanged,
+  reauthenticateWithCredential,
+  sendEmailVerification,
+  signInWithEmailAndPassword,
+  signOut,
+  updatePassword,
+  updateProfile
 } from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
+
 
 const AuthContext = createContext();
 
@@ -20,6 +32,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [publicProfile, setPublicProfile] = useState(null);
 
   // Listen to Firebase auth state changes
   useEffect(() => {
@@ -28,11 +41,24 @@ export function AuthProvider({ children }) {
         if (firebaseUser && firebaseUser.emailVerified) {
           // User is signed in and email is verified
           const token = await firebaseUser.getIdToken();
+          
+          // Ensure user has a Firestore profile (for existing users)
+          await ensureUserProfile(firebaseUser.uid, {
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName || "User",
+          });
+
+          // Fetch user profile from Firestore
+          const profileResult = await getUserProfile(firebaseUser.uid);
+          const publicProfileResult = await getPublicProfile(firebaseUser.uid);
+          
           const userData = {
             id: firebaseUser.uid,
             name: firebaseUser.displayName || "User",
             email: firebaseUser.email,
             emailVerified: firebaseUser.emailVerified,
+            // Merge Firestore data if available
+            ...(profileResult.success ? profileResult.data : {}),
           };
 
           // Store auth data
@@ -41,12 +67,18 @@ export function AuthProvider({ children }) {
 
           setIsAuthenticated(true);
           setUser(userData);
+          
+          // Set public profile data
+          if (publicProfileResult.success) {
+            setPublicProfile(publicProfileResult.data);
+          }
         } else {
           // User is signed out or email not verified
           await AsyncStorage.removeItem(AUTH_TOKEN_KEY);
           await AsyncStorage.removeItem(USER_DATA_KEY);
           setIsAuthenticated(false);
           setUser(null);
+          setPublicProfile(null);
         }
       } catch (error) {
         console.error("Error in auth state change:", error);
@@ -124,6 +156,17 @@ export function AuthProvider({ children }) {
         displayName: name,
       });
 
+      // Create Firestore profile
+      const profileResult = await createUserProfile(firebaseUser.uid, {
+        email,
+        displayName: name,
+      });
+
+      if (!profileResult.success) {
+        console.error("Failed to create profile:", profileResult.error);
+        // Continue anyway - profile can be created later
+      }
+
       // Send verification email
       await sendEmailVerification(firebaseUser);
 
@@ -184,13 +227,111 @@ export function AuthProvider({ children }) {
       await AsyncStorage.setItem(USER_DATA_KEY, JSON.stringify(updatedUser));
       setUser(updatedUser);
     } catch (error) {
-      console.error("Update user error:", error);
+      console.error("Update user error error:", error);
       setError("Failed to update user data");
+    }
+  };
+
+  const updateUserProfileData = async (data) => {
+    try {
+      if (!user?.id) {
+        throw new Error("No user logged in");
+      }
+
+      const result = await updateUserProfileService(user.id, data);
+      
+      if (result.success) {
+        // Update local state
+        const updatedUser = { ...user, ...data };
+        setUser(updatedUser);
+        await AsyncStorage.setItem(USER_DATA_KEY, JSON.stringify(updatedUser));
+        return { success: true };
+      }
+      
+      return result;
+    } catch (error) {
+      console.error("Update user profile error:", error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const updatePublicProfileData = async (data) => {
+    try {
+      if (!user?.id) {
+        throw new Error("No user logged in");
+      }
+
+      const result = await updatePublicProfileService(user.id, data);
+      
+      if (result.success) {
+        // Update local state
+        setPublicProfile({ ...publicProfile, ...data });
+        return { success: true };
+      }
+      
+      return result;
+    } catch (error) {
+      console.error("Update public profile error:", error);
+      return { success: false, error: error.message };
     }
   };
 
   const clearError = () => {
     setError(null);
+  };
+
+  const changePassword = async (currentPassword, newPassword) => {
+    try {
+      setError(null);
+
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        return { success: false, error: "No user logged in" };
+      }
+
+      // Re-authenticate user with current password
+      const credential = EmailAuthProvider.credential(
+        currentUser.email,
+        currentPassword
+      );
+
+      try {
+        await reauthenticateWithCredential(currentUser, credential);
+      } catch (reAuthError) {
+        console.error("Re-authentication error:", reAuthError);
+        let errorMessage = "Re-authentication failed";
+        
+        if (reAuthError.code === "auth/wrong-password" || reAuthError.code === "auth/invalid-credential") {
+          errorMessage = "Current password is incorrect";
+        } else if (reAuthError.code === "auth/too-many-requests") {
+          errorMessage = "Too many attempts. Please try again later";
+        } else if (reAuthError.code === "auth/network-request-failed") {
+          errorMessage = "Network error. Please check your connection";
+        }
+        
+        return { success: false, error: errorMessage };
+      }
+
+      // Update password
+      try {
+        await updatePassword(currentUser, newPassword);
+        return { success: true, message: "Password changed successfully" };
+      } catch (updateError) {
+        console.error("Password update error:", updateError);
+        let errorMessage = "Failed to update password";
+        
+        if (updateError.code === "auth/weak-password") {
+          errorMessage = "Password is too weak. Use at least 6 characters";
+        } else if (updateError.code === "auth/requires-recent-login") {
+          errorMessage = "Please log out and log in again before changing password";
+        }
+        
+        return { success: false, error: errorMessage };
+      }
+    } catch (error) {
+      console.error("Change password error:", error);
+      return { success: false, error: "An unexpected error occurred" };
+    }
   };
 
   const value = {
@@ -199,14 +340,18 @@ export function AuthProvider({ children }) {
     user,
     isLoading,
     error,
+    publicProfile,
 
     // Actions
     login,
     register,
     logout,
     updateUser,
+    updateUserProfileData,
+    updatePublicProfileData,
     clearError,
     resendVerificationEmail,
+    changePassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

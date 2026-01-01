@@ -1,30 +1,28 @@
-import { router, Tabs } from 'expo-router';
-import { useEffect } from 'react';
-
+import { Ionicons } from '@expo/vector-icons';
+import { Tabs } from 'expo-router';
 import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 
 export default function TabLayout() {
   const { colors } = useTheme();
-  const { isAuthenticated, isLoading } = useAuth();
-
-  // Monitor auth state and redirect when user logs out
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace('/login');
-    }
-  }, [isAuthenticated, isLoading]);
-
-  if (isLoading) {
-    return null;
-  }
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: colors.tabIconSelected,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.tabIconDefault,
+        tabBarStyle: {
+          backgroundColor: colors.tabBackground,
+          borderTopColor: colors.border,
+          borderTopWidth: 1,
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600',
+        },
         headerShown: false,
         tabBarButton: HapticTab,
       }}>
@@ -32,21 +30,52 @@ export default function TabLayout() {
         name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons 
+              name={focused ? 'rocket' : 'rocket-outline'} 
+              size={26} 
+              color={color} 
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="search"
+        options={{
+          title: 'Discover',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons 
+              name={focused ? 'compass' : 'compass-outline'} 
+              size={26} 
+              color={color} 
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="chat"
         options={{
-          title: 'Chat',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chatbubble.fill" color={color} />,
+          title: 'Messages',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons 
+              name={focused ? 'chatbubble-ellipses' : 'chatbubble-ellipses-outline'} 
+              size={26} 
+              color={color} 
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons 
+              name={focused ? 'person-circle' : 'person-circle-outline'} 
+              size={26} 
+              color={color} 
+            />
+          ),
         }}
       />
     </Tabs>

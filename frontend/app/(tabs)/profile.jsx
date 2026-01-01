@@ -1,13 +1,16 @@
+import ThemeSelector from '@/components/theme-selector';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
-import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Alert, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const Profile = () => {
   const { colors, spacing } = useTheme();
-  const { user, logout } = useAuth();
+  const { user, logout, publicProfile } = useAuth();
+  const router = useRouter();
 
   const handleLogout = () => {
     Alert.alert(
@@ -27,7 +30,7 @@ const Profile = () => {
   };
 
   const handleEditProfile = () => {
-    Alert.alert('Coming Soon', 'Edit profile functionality will be available soon!');
+    router.push('/(modals)/edit-public-profile');
   };
 
   const handleSettings = () => {
@@ -67,11 +70,18 @@ const Profile = () => {
         
         {/* Header with Avatar */}
         <View style={styles.header}>
-          <View style={[styles.avatarContainer, { backgroundColor: colors.primary }]}>
-            <ThemedText style={styles.avatarText}>
-              {user?.name?.charAt(0).toUpperCase() || 'U'}
-            </ThemedText>
-          </View>
+          {publicProfile?.profileImage ? (
+            <Image 
+              source={{ uri: publicProfile.profileImage }} 
+              style={styles.avatarContainer}
+            />
+          ) : (
+            <View style={[styles.avatarContainer, { backgroundColor: colors.primary }]}>
+              <ThemedText style={styles.avatarText}>
+                {user?.name?.charAt(0).toUpperCase() || 'U'}
+              </ThemedText>
+            </View>
+          )}
           <ThemedText type="title" style={styles.userName}>
             {user?.name || 'User'}
           </ThemedText>
@@ -103,7 +113,7 @@ const Profile = () => {
           <ProfileItem 
             icon="key-outline" 
             label="Change Password" 
-            onPress={() => Alert.alert('Coming Soon', 'Password change will be available soon!')}
+            onPress={() => router.push('/(modals)/change-password')}
             showChevron 
           />
         </View>
@@ -123,11 +133,14 @@ const Profile = () => {
             onPress={() => Alert.alert('Coming Soon', 'Notification settings will be available soon!')}
             showChevron 
           />
-          <ProfileItem 
-            icon="moon-outline" 
-            label="Dark Mode" 
-            value="Auto" 
-          />
+        </View>
+
+        {/* Theme Section */}
+        <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>Theme</ThemedText>
+          <View style={[styles.themeContainer, { backgroundColor: colors.backgroundSecondary }]}>
+            <ThemeSelector />
+          </View>
         </View>
 
         {/* Support Section */}
@@ -280,5 +293,9 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 12,
     opacity: 0.4,
+  },
+  themeContainer: {
+    padding: 16,
+    borderRadius: 12,
   },
 });

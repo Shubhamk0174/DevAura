@@ -11,94 +11,115 @@ import { Platform } from 'react-native';
 
 /**
  * Color palette for the application
- * Organized by light and dark themes
+ * Modern, vibrant colors with proper contrast
  */
 
 export const lightTheme = {
-  // Primary colors
-  primary: '#0a7ea4',
-  primaryLight: '#A1CEDC',
-  primaryDark: '#1D3D47',
+  // Primary colors - Vibrant blue-purple gradient feel
+  primary: '#6366F1', // Indigo
+  primaryLight: '#A5B4FC',
+  primaryDark: '#4338CA',
 
-  // Background colors
-  background: '#fff',
-  backgroundSecondary: '#f5f5f5',
+  // Accent colors
+  accent: '#8B5CF6', // Purple
+  accentLight: '#C4B5FD',
+
+  // Background colors - Warm, modern feel
+  background: '#FFFFFF',
+  backgroundSecondary: '#F8FAFC',
+  backgroundTertiary: '#F1F5F9',
 
   // Text colors
-  text: '#11181C',
-  textSecondary: '#687076',
-  textLink: '#0a7ea4',
+  text: '#0F172A',
+  textSecondary: '#64748B',
+  textTertiary: '#94A3B8',
+  textLink: '#6366F1',
 
   // Button text colors
-  buttonText: '#fff',
-  buttonTextSecondary: '#11181C',
+  buttonText: '#FFFFFF',
+  buttonTextSecondary: '#0F172A',
 
   // Icon colors
-  icon: '#687076',
-  iconActive: '#0a7ea4',
+  icon: '#64748B',
+  iconActive: '#6366F1',
 
   // Tab colors
-  tabBackground: '#fff',
-  tabIconDefault: '#687076',
-  tabIconSelected: '#0a7ea4',
+  tabBackground: '#FFFFFF',
+  tabIconDefault: '#94A3B8',
+  tabIconSelected: '#6366F1',
 
   // Border colors
-  border: '#e1e1e1',
-  borderLight: '#f0f0f0',
+  border: '#E2E8F0',
+  borderLight: '#F1F5F9',
 
-  // Status colors
-  success: '#4CAF50',
-  warning: '#FF9800',
-  error: '#F44336',
-  info: '#2196F3',
+  // Status colors - Vibrant and modern
+  success: '#10B981', // Emerald
+  warning: '#F59E0B', // Amber
+  error: '#EF4444', // Red
+  info: '#3B82F6', // Blue
 
   // Utility
-  shadow: 'rgba(0, 0, 0, 0.1)',
-  overlay: 'rgba(0, 0, 0, 0.5)',
+  shadow: 'rgba(15, 23, 42, 0.08)',
+  overlay: 'rgba(15, 23, 42, 0.5)',
+  
+  // Card colors
+  card: '#FFFFFF',
+  cardHover: '#F8FAFC',
 };
 
 export const darkTheme = {
-  // Primary colors
-  primary: '#fff',
-  primaryLight: '#353636',
-  primaryDark: '#151718',
+  // Primary colors - Vibrant on true black
+  primary: '#8B5CF6', // Indigo/Purple that pops on black
+  primaryLight: '#A78BFA',
+  primaryDark: '#5B21B6',
 
-  // Background colors
-  background: '#151718',
-  backgroundSecondary: '#1e1e1e',
+  // Accent colors
+  accent: '#C4B5FD',
+  accentLight: '#A78BFA',
+
+  // Background colors - True black theme
+  background: '#000000',            // Pure black (AMOLED)
+  backgroundSecondary: '#0A0A0A',    // Near black
+  backgroundTertiary: '#121212',     // Material-style dark surface
 
   // Text colors
-  text: '#ECEDEE',
-  textSecondary: '#9BA1A6',
-  textLink: '#4fc3f7',
+  text: '#FAFAFA',                   // Almost white (less eye strain)
+  textSecondary: '#B3B3B3',
+  textTertiary: '#8A8A8A',
+  textLink: '#8B5CF6',
 
   // Button text colors
-  buttonText: '#151718',
-  buttonTextSecondary: '#ECEDEE',
+  buttonText: '#000000',
+  buttonTextSecondary: '#FAFAFA',
 
   // Icon colors
-  icon: '#9BA1A6',
-  iconActive: '#fff',
+  icon: '#9CA3AF',
+  iconActive: '#8B5CF6',
 
   // Tab colors
-  tabBackground: '#151718',
-  tabIconDefault: '#9BA1A6',
-  tabIconSelected: '#fff',
+  tabBackground: '#000000',
+  tabIconDefault: '#6B7280',
+  tabIconSelected: '#8B5CF6',
 
   // Border colors
-  border: '#2c2c2c',
-  borderLight: '#242424',
+  border: '#1F1F1F',
+  borderLight: '#141414',
 
-  // Status colors
-  success: '#66BB6A',
-  warning: '#FFA726',
-  error: '#EF5350',
-  info: '#42A5F5',
+  // Status colors - Tuned for black background
+  success: '#22C55E',
+  warning: '#FACC15',
+  error: '#EF4444',
+  info: '#3B82F6',
 
   // Utility
-  shadow: 'rgba(0, 0, 0, 0.3)',
-  overlay: 'rgba(0, 0, 0, 0.7)',
+  shadow: 'rgba(0, 0, 0, 0.8)',
+  overlay: 'rgba(0, 0, 0, 0.85)',
+
+  // Card colors
+  card: '#0F0F0F',
+  cardHover: '#1A1A1A',
 };
+
 
 // ==========================================
 // FONTS

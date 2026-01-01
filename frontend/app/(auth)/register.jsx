@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Link, router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 
 const Register = () => {
   const { colors, spacing, borderRadius } = useTheme();
@@ -79,7 +79,11 @@ const Register = () => {
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <KeyboardAvoidingView 
+      style={{ flex: 1 }} 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ThemedView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <ThemedView style={styles.content}>
           <ThemedText type="title" style={styles.title}>
@@ -163,9 +167,13 @@ const Register = () => {
               ]}
               onPress={handleRegister}
               disabled={isLoading}>
-              <ThemedText style={[styles.buttonText, { color: colors.buttonText }]}>
-                {isLoading ? 'Creating Account...' : 'Create Account'}
-              </ThemedText>
+              {isLoading ? (
+                <ActivityIndicator color={colors.buttonText} />
+              ) : (
+                <ThemedText style={[styles.buttonText, { color: colors.buttonText }]}>
+                  Create Account
+                </ThemedText>
+              )}
             </TouchableOpacity>
           </ThemedView>
 
@@ -179,7 +187,8 @@ const Register = () => {
           </ThemedView>
         </ThemedView>
       </ScrollView>
-    </ThemedView>
+      </ThemedView>
+    </KeyboardAvoidingView>
   );
 };
 

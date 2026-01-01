@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 
 const Login = () => {
   const { colors, spacing, borderRadius } = useTheme();
@@ -49,7 +49,11 @@ const Login = () => {
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <KeyboardAvoidingView 
+      style={{ flex: 1 }} 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ThemedView style={styles.container}>
       <ThemedView style={styles.content}>
         <ThemedText type="title" style={styles.title}>
           Welcome Back
@@ -92,18 +96,22 @@ const Login = () => {
             secureTextEntry
           />
 
-          <TouchableOpacity
-            style={[
-              styles.button,
-              { backgroundColor: colors.primary },
-              isLoading && { opacity: 0.6 }
-            ]}
-            onPress={handleLogin}
-            disabled={isLoading}>
-            <ThemedText style={[styles.buttonText, { color: colors.buttonText }]}>
-              {isLoading ? 'Signing In...' : 'Sign In'}
-            </ThemedText>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                { backgroundColor: colors.primary },
+                isLoading && { opacity: 0.6 }
+              ]}
+              onPress={handleLogin}
+              disabled={isLoading}>
+              {isLoading ? (
+                <ActivityIndicator color={colors.buttonText} />
+              ) : (
+                <ThemedText style={[styles.buttonText, { color: colors.buttonText }]}>
+                  Sign In
+                </ThemedText>
+              )}
+            </TouchableOpacity>
         </ThemedView>
 
         <ThemedView style={styles.footer}>
@@ -115,7 +123,8 @@ const Login = () => {
           </Link>
         </ThemedView>
       </ThemedView>
-    </ThemedView>
+      </ThemedView>
+    </KeyboardAvoidingView>
   );
 };
 
