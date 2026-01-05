@@ -2,7 +2,7 @@
  * Cloudinary Image Upload Service
  * Handles image uploads to Cloudinary for profile pictures and other media
  */
-import Constants from 'expo-constants';
+import Constants from "expo-constants";
 
 /**
  * Upload an image to Cloudinary
@@ -10,41 +10,46 @@ import Constants from 'expo-constants';
  * @param {string} folder - Cloudinary folder name (e.g., 'profile-pictures')
  * @returns {Promise<{success: boolean, url?: string, error?: string}>}
  */
-export const uploadImageToCloudinary = async (imageUri, folder = 'profile-pictures') => {
+export const uploadImageToCloudinary = async (
+  imageUri,
+  folder = "profile-pictures"
+) => {
   try {
     // Get Cloudinary configuration from environment variables
     const cloudName = Constants.expoConfig?.extra?.cloudinaryCloudName;
     const uploadPreset = Constants.expoConfig?.extra?.cloudinaryUploadPreset;
 
     if (!cloudName || !uploadPreset) {
-      throw new Error('Cloudinary configuration missing. Please check your .env file.');
+      throw new Error(
+        "Cloudinary configuration missing. Please check your .env file."
+      );
     }
 
     // Create form data
     const formData = new FormData();
-    
+
     // Get file extension from URI
-    const fileExtension = imageUri.split('.').pop();
+    const fileExtension = imageUri.split(".").pop();
     const fileName = `upload_${Date.now()}.${fileExtension}`;
 
     // Append image file
-    formData.append('file', {
+    formData.append("file", {
       uri: imageUri,
       type: `image/${fileExtension}`,
       name: fileName,
     });
 
-    formData.append('upload_preset', uploadPreset);
-    formData.append('folder', folder);
+    formData.append("upload_preset", uploadPreset);
+    formData.append("folder", folder);
 
     // Upload to Cloudinary
     const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
-    
+
     const response = await fetch(cloudinaryUrl, {
-      method: 'POST',
+      method: "POST",
       body: formData,
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
 
@@ -57,13 +62,13 @@ export const uploadImageToCloudinary = async (imageUri, folder = 'profile-pictur
         publicId: data.public_id,
       };
     } else {
-      throw new Error(data.error?.message || 'Upload failed');
+      throw new Error(data.error?.message || "Upload failed");
     }
   } catch (error) {
-    console.error('Cloudinary upload error:', error);
+    console.error("Cloudinary upload error:", error);
     return {
       success: false,
-      error: error.message || 'Failed to upload image',
+      error: error.message || "Failed to upload image",
     };
   }
 };
@@ -75,51 +80,57 @@ export const uploadImageToCloudinary = async (imageUri, folder = 'profile-pictur
  * @param {string} resourceType - 'image', 'raw' (for PDFs), or 'auto'
  * @returns {Promise<{success: boolean, url?: string, fileType?: string, error?: string}>}
  */
-export const uploadDocument = async (fileUri, folder = 'documents', resourceType = 'auto') => {
+export const uploadDocument = async (
+  fileUri,
+  folder = "documents",
+  resourceType = "auto"
+) => {
   try {
     // Get Cloudinary configuration from environment variables
     const cloudName = Constants.expoConfig?.extra?.cloudinaryCloudName;
     const uploadPreset = Constants.expoConfig?.extra?.cloudinaryUploadPreset;
 
     if (!cloudName || !uploadPreset) {
-      throw new Error('Cloudinary configuration missing. Please check your .env file.');
+      throw new Error(
+        "Cloudinary configuration missing. Please check your .env file."
+      );
     }
 
     // Determine file type
-    const fileExtension = fileUri.split('.').pop().toLowerCase();
-    const isPdf = fileExtension === 'pdf';
+    const fileExtension = fileUri.split(".").pop().toLowerCase();
+    const isPdf = fileExtension === "pdf";
     const fileName = `upload_${Date.now()}.${fileExtension}`;
 
     // Determine MIME type
     let mimeType;
     if (isPdf) {
-      mimeType = 'application/pdf';
-    } else if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
-      mimeType = `image/${fileExtension === 'jpg' ? 'jpeg' : fileExtension}`;
+      mimeType = "application/pdf";
+    } else if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
+      mimeType = `image/${fileExtension === "jpg" ? "jpeg" : fileExtension}`;
     } else {
-      mimeType = 'application/octet-stream';
+      mimeType = "application/octet-stream";
     }
 
     // Create form data
     const formData = new FormData();
-    formData.append('file', {
+    formData.append("file", {
       uri: fileUri,
       type: mimeType,
       name: fileName,
     });
 
-    formData.append('upload_preset', uploadPreset);
-    formData.append('folder', folder);
+    formData.append("upload_preset", uploadPreset);
+    formData.append("folder", folder);
 
     // Use appropriate endpoint based on resource type
-    const endpoint = isPdf || resourceType === 'raw' ? 'raw' : 'image';
+    const endpoint = isPdf || resourceType === "raw" ? "raw" : "image";
     const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${endpoint}/upload`;
-    
+
     const response = await fetch(cloudinaryUrl, {
-      method: 'POST',
+      method: "POST",
       body: formData,
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
 
@@ -130,16 +141,16 @@ export const uploadDocument = async (fileUri, folder = 'documents', resourceType
         success: true,
         url: data.secure_url,
         publicId: data.public_id,
-        fileType: isPdf ? 'pdf' : 'image',
+        fileType: isPdf ? "pdf" : "image",
       };
     } else {
-      throw new Error(data.error?.message || 'Upload failed');
+      throw new Error(data.error?.message || "Upload failed");
     }
   } catch (error) {
-    console.error('Cloudinary document upload error:', error);
+    console.error("Cloudinary document upload error:", error);
     return {
       success: false,
-      error: error.message || 'Failed to upload document',
+      error: error.message || "Failed to upload document",
     };
   }
 };
@@ -153,10 +164,10 @@ export const uploadDocument = async (fileUri, folder = 'documents', resourceType
 export const deleteImageFromCloudinary = async (publicId) => {
   // This should be implemented on your backend server
   // as it requires the Cloudinary API secret which should never be exposed in client code
-  console.warn('Delete operation should be handled by backend server');
+  console.warn("Delete operation should be handled by backend server");
   return {
     success: false,
-    error: 'Delete operation requires backend implementation',
+    error: "Delete operation requires backend implementation",
   };
 };
 
@@ -170,17 +181,20 @@ export const getOptimizedImageUrl = (imageUrl, options = {}) => {
   const {
     width = 400,
     height = 400,
-    quality = 'auto',
-    format = 'auto',
+    quality = "auto",
+    format = "auto",
   } = options;
 
-  if (!imageUrl || !imageUrl.includes('cloudinary.com')) {
+  if (!imageUrl || !imageUrl.includes("cloudinary.com")) {
     return imageUrl;
   }
 
   // Insert transformations into Cloudinary URL
   const transformation = `w_${width},h_${height},c_fill,q_${quality},f_${format}`;
-  const optimizedUrl = imageUrl.replace('/upload/', `/upload/${transformation}/`);
+  const optimizedUrl = imageUrl.replace(
+    "/upload/",
+    `/upload/${transformation}/`
+  );
 
   return optimizedUrl;
 };

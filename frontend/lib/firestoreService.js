@@ -1,14 +1,14 @@
 import {
-    collection,
-    doc,
-    getDoc,
-    getDocs,
-    limit,
-    query,
-    serverTimestamp,
-    setDoc,
-    updateDoc,
-    where
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  query,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  where,
 } from "firebase/firestore";
 import { db } from "./firebase";
 
@@ -16,7 +16,10 @@ import { db } from "./firebase";
  * Generates a unique username from display name
  */
 const generateUsername = (displayName) => {
-  const baseName = displayName.toLowerCase().split(' ')[0].replace(/[^a-z0-9]/g, '');
+  const baseName = displayName
+    .toLowerCase()
+    .split(" ")[0]
+    .replace(/[^a-z0-9]/g, "");
   const randomString = Math.random().toString(36).substring(2, 8);
   return `${baseName}-${randomString}`;
 };
@@ -32,7 +35,7 @@ export const checkUsernameAvailability = async (username) => {
       limit(1)
     );
     const querySnapshot = await getDocs(q);
-    
+
     return { success: true, available: querySnapshot.empty };
   } catch (error) {
     console.error("Error checking username:", error);
@@ -47,12 +50,12 @@ export const checkUsernameAvailability = async (username) => {
 export const createUserProfile = async (userId, userData) => {
   try {
     const { email, displayName } = userData;
-    
+
     // Generate unique username
     let username = generateUsername(displayName);
     let isAvailable = false;
     let attempts = 0;
-    
+
     // Keep trying until we get a unique username (max 10 attempts)
     while (!isAvailable && attempts < 10) {
       const checkResult = await checkUsernameAvailability(username);
@@ -132,12 +135,16 @@ export const getPublicProfile = async (userId) => {
 
     if (profileSnap.exists()) {
       const data = profileSnap.data();
-      
+
       // Check if profile is set to public
       if (!data.isPublic) {
-        return { success: false, error: "This profile is private", isPrivate: true };
+        return {
+          success: false,
+          error: "This profile is private",
+          isPrivate: true,
+        };
       }
-      
+
       return { success: true, data };
     } else {
       return { success: false, error: "Public profile not found" };
@@ -216,17 +223,19 @@ export const searchUsers = async (searchTerm) => {
 
     const searchLower = searchTerm.toLowerCase();
     const usersRef = collection(db, "publicProfiles");
-    
+
     // Get all public profiles (in production, you'd want pagination)
     const q = query(usersRef, where("isPublic", "==", true));
     const querySnapshot = await getDocs(q);
-    
+
     const users = [];
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      const displayNameMatch = data.displayName?.toLowerCase().includes(searchLower);
+      const displayNameMatch = data.displayName
+        ?.toLowerCase()
+        .includes(searchLower);
       const usernameMatch = data.username?.toLowerCase().includes(searchLower);
-      
+
       if (displayNameMatch || usernameMatch) {
         users.push({
           id: doc.id,
@@ -248,12 +257,8 @@ export const searchUsers = async (searchTerm) => {
 export const getFeaturedUsers = async (limitCount = 20) => {
   try {
     const usersRef = collection(db, "publicProfiles");
-    const q = query(
-      usersRef, 
-      where("isPublic", "==", true),
-      limit(limitCount)
-    );
-    
+    const q = query(usersRef, where("isPublic", "==", true), limit(limitCount));
+
     const querySnapshot = await getDocs(q);
     const users = [];
     querySnapshot.forEach((doc) => {

@@ -1,10 +1,10 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useTheme } from '@/context/ThemeContext';
-import { searchUsers } from '@/lib/firestoreService';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { useTheme } from "@/context/ThemeContext";
+import { searchUsers } from "@/lib/firestoreService";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -12,20 +12,20 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  View
-} from 'react-native';
+  View,
+} from "react-native";
 
 const Search = () => {
   const { colors } = useTheme();
   const router = useRouter();
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
   const handleSearch = async (text) => {
     setSearchTerm(text);
-    
+
     if (text.trim().length < 2) {
       setSearchResults([]);
       return;
@@ -45,8 +45,8 @@ const Search = () => {
       style={[styles.userCard, { backgroundColor: colors.backgroundSecondary }]}
       onPress={() => {
         router.push({
-          pathname: '/(modals)/view-profile',
-          params: { userId: item.id }
+          pathname: "/(modals)/view-profile",
+          params: { userId: item.id },
         });
       }}
     >
@@ -56,7 +56,7 @@ const Search = () => {
         ) : (
           <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
             <ThemedText style={styles.avatarText}>
-              {item.displayName?.charAt(0).toUpperCase() || 'U'}
+              {item.displayName?.charAt(0).toUpperCase() || "U"}
             </ThemedText>
           </View>
         )}
@@ -68,7 +68,6 @@ const Search = () => {
               {item.bio}
             </ThemedText>
           )}
-         
         </View>
       </View>
       <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
@@ -78,10 +77,22 @@ const Search = () => {
   return (
     <ThemedView style={styles.container}>
       {/* Search Header */}
-      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-        
+      <View
+        style={[
+          styles.header,
+          {
+            backgroundColor: colors.background,
+            borderBottomColor: colors.border,
+          },
+        ]}
+      >
         {/* Search Bar */}
-        <View style={[styles.searchContainer, { backgroundColor: colors.backgroundSecondary }]}>
+        <View
+          style={[
+            styles.searchContainer,
+            { backgroundColor: colors.backgroundSecondary },
+          ]}
+        >
           <Ionicons name="search" size={20} color={colors.textSecondary} />
           <TextInput
             style={[styles.searchInput, { color: colors.text }]}
@@ -93,8 +104,12 @@ const Search = () => {
             autoCorrect={false}
           />
           {searchTerm.length > 0 && (
-            <TouchableOpacity onPress={() => handleSearch('')}>
-              <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
+            <TouchableOpacity onPress={() => handleSearch("")}>
+              <Ionicons
+                name="close-circle"
+                size={20}
+                color={colors.textSecondary}
+              />
             </TouchableOpacity>
           )}
         </View>
@@ -108,7 +123,11 @@ const Search = () => {
         </View>
       ) : searchTerm.length === 0 ? (
         <View style={styles.centerContainer}>
-          <Ionicons name="search-outline" size={64} color={colors.textSecondary} />
+          <Ionicons
+            name="search-outline"
+            size={64}
+            color={colors.textSecondary}
+          />
           <ThemedText style={styles.emptyTitle}>Find People</ThemedText>
           <ThemedText style={styles.emptySubtitle}>
             Search for users by their name or username
@@ -116,10 +135,14 @@ const Search = () => {
         </View>
       ) : searchResults.length === 0 ? (
         <View style={styles.centerContainer}>
-          <Ionicons name="people-outline" size={64} color={colors.textSecondary} />
+          <Ionicons
+            name="people-outline"
+            size={64}
+            color={colors.textSecondary}
+          />
           <ThemedText style={styles.emptyTitle}>No Results</ThemedText>
           <ThemedText style={styles.emptySubtitle}>
-            No users found matching "{searchTerm}"
+            No users found matching &quot;{searchTerm}&quot;
           </ThemedText>
         </View>
       ) : (
@@ -148,8 +171,8 @@ const styles = StyleSheet.create({
   },
 
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 12,
@@ -161,8 +184,8 @@ const styles = StyleSheet.create({
   },
   centerContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 40,
   },
   loadingText: {
@@ -172,29 +195,29 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
     marginTop: 16,
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 14,
     opacity: 0.6,
-    textAlign: 'center',
+    textAlign: "center",
   },
   listContainer: {
     padding: 16,
   },
   userCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
   },
   userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
     gap: 12,
   },
@@ -202,13 +225,13 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   avatarText: {
     fontSize: 24,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
   },
   userDetails: {
     flex: 1,
@@ -216,7 +239,7 @@ const styles = StyleSheet.create({
   },
   displayName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   username: {
     fontSize: 13,

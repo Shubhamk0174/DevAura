@@ -1,12 +1,12 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useAuth } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
-import { getPublicProfile } from '@/lib/firestoreService';
-import { createOrGetConversation } from '@/lib/chatService';
-import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
+import { getPublicProfile } from "@/lib/firestoreService";
+import { createOrGetConversation } from "@/lib/chatService";
+import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState, useCallback } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -15,8 +15,8 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  View
-} from 'react-native';
+  View,
+} from "react-native";
 
 const ViewProfile = () => {
   const { colors } = useTheme();
@@ -31,29 +31,29 @@ const ViewProfile = () => {
 
   useEffect(() => {
     loadProfile();
-  }, [userId]);
+  }, [userId, loadProfile]);
 
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const result = await getPublicProfile(userId);
-      
+
       if (result.success) {
         setProfile(result.data);
       } else {
-        setError(result.error || 'Failed to load profile');
+        setError(result.error || "Failed to load profile");
         if (result.isPrivate) {
-          Alert.alert('Private Profile', 'This profile is set to private.');
+          Alert.alert("Private Profile", "This profile is set to private.");
         }
       }
-    } catch (err) {
-      setError('An error occurred');
+    } catch (_err) {
+      setError("An error occurred");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [userId]);
 
   const openUrl = (url) => {
     if (url) {
@@ -62,58 +62,66 @@ const ViewProfile = () => {
   };
 
   const startChat = async () => {
-    console.log('startChat called');
-    console.log('user?.id:', user?.id);
-    console.log('profile:', profile?.displayName);
-    
+    console.log("startChat called");
+    console.log("user?.id:", user?.id);
+    console.log("profile:", profile?.displayName);
+
     if (!user?.id || !profile) {
-      console.log('Early return - missing user or profile');
+      console.log("Early return - missing user or profile");
       return;
     }
-    
+
     setIsStartingChat(true);
-    
+
     const currentUserDetails = {
-      displayName: publicProfile?.displayName || user.name || 'User',
-      profileImage: publicProfile?.profileImage || '',
-      username: publicProfile?.username || ''
+      displayName: publicProfile?.displayName || user.name || "User",
+      profileImage: publicProfile?.profileImage || "",
+      username: publicProfile?.username || "",
     };
-    
+
     const otherUserDetails = {
       displayName: profile.displayName,
-      profileImage: profile.profileImage || '',
-      username: profile.username || ''
+      profileImage: profile.profileImage || "",
+      username: profile.username || "",
     };
-    
-    console.log('Creating conversation...');
+
+    console.log("Creating conversation...");
     const result = await createOrGetConversation(
       user.id,
       userId,
       currentUserDetails,
       otherUserDetails
     );
-    
-    console.log('Result:', result);
+
+    console.log("Result:", result);
     setIsStartingChat(false);
-    
+
     if (result.success) {
-      console.log('Navigating to chat room...');
+      console.log("Navigating to chat room...");
       router.push({
-        pathname: '/(modals)/chat-room',
-        params: { 
+        pathname: "/(modals)/chat-room",
+        params: {
           conversationId: result.conversation.id,
-          otherUserId: userId
-        }
+          otherUserId: userId,
+        },
       });
     } else {
-      Alert.alert('Error', 'Could not start conversation');
+      Alert.alert("Error", "Could not start conversation");
     }
   };
 
   if (isLoading) {
     return (
       <ThemedView style={styles.container}>
-        <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+        <View
+          style={[
+            styles.header,
+            {
+              backgroundColor: colors.background,
+              borderBottomColor: colors.border,
+            },
+          ]}
+        >
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
@@ -131,7 +139,15 @@ const ViewProfile = () => {
   if (error || !profile) {
     return (
       <ThemedView style={styles.container}>
-        <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+        <View
+          style={[
+            styles.header,
+            {
+              backgroundColor: colors.background,
+              borderBottomColor: colors.border,
+            },
+          ]}
+        >
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
@@ -139,10 +155,16 @@ const ViewProfile = () => {
           <View style={{ width: 24 }} />
         </View>
         <View style={styles.centerContainer}>
-          <Ionicons name="alert-circle-outline" size={64} color={colors.error} />
-          <ThemedText style={styles.errorTitle}>Unable to Load Profile</ThemedText>
+          <Ionicons
+            name="alert-circle-outline"
+            size={64}
+            color={colors.error}
+          />
+          <ThemedText style={styles.errorTitle}>
+            Unable to Load Profile
+          </ThemedText>
           <ThemedText style={styles.errorSubtitle}>{error}</ThemedText>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.retryButton, { backgroundColor: colors.primary }]}
             onPress={loadProfile}
           >
@@ -154,18 +176,25 @@ const ViewProfile = () => {
   }
 
   // Check if profile has any content
-  const hasContent = (
+  const hasContent =
     (profile.skills && profile.skills.length > 0) ||
     (profile.achievements && profile.achievements.length > 0) ||
     (profile.experience && profile.experience.length > 0) ||
     (profile.certifications && profile.certifications.length > 0) ||
-    (profile.projects && profile.projects.length > 0)
-  );
+    (profile.projects && profile.projects.length > 0);
 
   return (
     <ThemedView style={styles.container}>
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+      <View
+        style={[
+          styles.header,
+          {
+            backgroundColor: colors.background,
+            borderBottomColor: colors.border,
+          },
+        ]}
+      >
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
@@ -173,41 +202,60 @@ const ViewProfile = () => {
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Profile Header */}
         <View style={styles.profileHeader}>
           {/* Profile Picture */}
           <View style={styles.profileImageContainer}>
             {profile.profileImage ? (
-              <Image 
-                source={{ uri: profile.profileImage }} 
+              <Image
+                source={{ uri: profile.profileImage }}
                 style={styles.profileImage}
               />
             ) : (
-              <View style={[styles.profileImage, { backgroundColor: colors.primary }]}>
+              <View
+                style={[
+                  styles.profileImage,
+                  { backgroundColor: colors.primary },
+                ]}
+              >
                 <ThemedText style={styles.profileImageText}>
-                  {profile.displayName?.charAt(0).toUpperCase() || 'U'}
+                  {profile.displayName?.charAt(0).toUpperCase() || "U"}
                 </ThemedText>
               </View>
             )}
           </View>
 
           {/* Profile Info */}
-          <ThemedText style={styles.displayName}>{profile.displayName}</ThemedText>
+          <ThemedText style={styles.displayName}>
+            {profile.displayName}
+          </ThemedText>
           {profile.username && (
             <ThemedText style={styles.username}>@{profile.username}</ThemedText>
           )}
           {profile.location && (
             <View style={styles.locationRow}>
-              <Ionicons name="location-outline" size={14} color={colors.textSecondary} />
-              <ThemedText style={styles.location}>{profile.location}</ThemedText>
+              <Ionicons
+                name="location-outline"
+                size={14}
+                color={colors.textSecondary}
+              />
+              <ThemedText style={styles.location}>
+                {profile.location}
+              </ThemedText>
             </View>
           )}
           {profile.bio && (
             <ThemedText style={styles.bio}>{profile.bio}</ThemedText>
           )}
           {profile.website && (
-            <TouchableOpacity style={styles.websiteRow} onPress={() => openUrl(profile.website)}>
+            <TouchableOpacity
+              style={styles.websiteRow}
+              onPress={() => openUrl(profile.website)}
+            >
               <Ionicons name="link-outline" size={16} color={colors.primary} />
               <ThemedText style={[styles.website, { color: colors.primary }]}>
                 {profile.website}
@@ -228,7 +276,9 @@ const ViewProfile = () => {
             ) : (
               <>
                 <Ionicons name="chatbubble-ellipses" size={20} color="#fff" />
-                <ThemedText style={styles.messageButtonText}>Message</ThemedText>
+                <ThemedText style={styles.messageButtonText}>
+                  Message
+                </ThemedText>
               </>
             )}
           </TouchableOpacity>
@@ -236,19 +286,34 @@ const ViewProfile = () => {
 
         {/* Stats Row - Only show if user has content */}
         {hasContent && (
-          <View style={[styles.statsContainer, { backgroundColor: colors.backgroundSecondary }]}>
+          <View
+            style={[
+              styles.statsContainer,
+              { backgroundColor: colors.backgroundSecondary },
+            ]}
+          >
             <View style={styles.statItem}>
-              <ThemedText style={styles.statValue}>{profile.skills?.length || 0}</ThemedText>
+              <ThemedText style={styles.statValue}>
+                {profile.skills?.length || 0}
+              </ThemedText>
               <ThemedText style={styles.statLabel}>Skills</ThemedText>
             </View>
-            <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+            <View
+              style={[styles.statDivider, { backgroundColor: colors.border }]}
+            />
             <View style={styles.statItem}>
-              <ThemedText style={styles.statValue}>{profile.experience?.length || 0}</ThemedText>
+              <ThemedText style={styles.statValue}>
+                {profile.experience?.length || 0}
+              </ThemedText>
               <ThemedText style={styles.statLabel}>Experience</ThemedText>
             </View>
-            <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+            <View
+              style={[styles.statDivider, { backgroundColor: colors.border }]}
+            />
             <View style={styles.statItem}>
-              <ThemedText style={styles.statValue}>{profile.projects?.length || 0}</ThemedText>
+              <ThemedText style={styles.statValue}>
+                {profile.projects?.length || 0}
+              </ThemedText>
               <ThemedText style={styles.statLabel}>Projects</ThemedText>
             </View>
           </View>
@@ -263,11 +328,19 @@ const ViewProfile = () => {
             </View>
             <View style={styles.skillsGrid}>
               {profile.skills.map((skill, index) => (
-                <View 
-                  key={index} 
-                  style={[styles.skillChip, { backgroundColor: colors.primary + '15', borderColor: colors.primary }]}
+                <View
+                  key={index}
+                  style={[
+                    styles.skillChip,
+                    {
+                      backgroundColor: colors.primary + "15",
+                      borderColor: colors.primary,
+                    },
+                  ]}
                 >
-                  <ThemedText style={[styles.skillText, { color: colors.primary }]}>
+                  <ThemedText
+                    style={[styles.skillText, { color: colors.primary }]}
+                  >
                     {skill}
                   </ThemedText>
                 </View>
@@ -280,20 +353,49 @@ const ViewProfile = () => {
         {profile.experience && profile.experience.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Ionicons name="briefcase-outline" size={20} color={colors.text} />
+              <Ionicons
+                name="briefcase-outline"
+                size={20}
+                color={colors.text}
+              />
               <ThemedText style={styles.sectionTitle}>Experience</ThemedText>
             </View>
             {profile.experience.map((exp, index) => (
-              <View key={exp.id || index} style={[styles.experienceCard, { backgroundColor: colors.backgroundSecondary }]}>
-                <View style={[styles.expIcon, { backgroundColor: colors.primary + '20' }]}>
+              <View
+                key={exp.id || index}
+                style={[
+                  styles.experienceCard,
+                  { backgroundColor: colors.backgroundSecondary },
+                ]}
+              >
+                <View
+                  style={[
+                    styles.expIcon,
+                    { backgroundColor: colors.primary + "20" },
+                  ]}
+                >
                   <Ionicons name="briefcase" size={20} color={colors.primary} />
                 </View>
                 <View style={styles.expContent}>
-                  <ThemedText style={styles.expPosition}>{exp.position}</ThemedText>
-                  <ThemedText style={styles.expCompany}>{exp.company}</ThemedText>
-                  {exp.location && <ThemedText style={styles.expLocation}>{exp.location}</ThemedText>}
-                  <ThemedText style={styles.expDate}>{exp.startDate} - {exp.endDate || 'Present'}</ThemedText>
-                  {exp.description && <ThemedText style={styles.expDescription}>{exp.description}</ThemedText>}
+                  <ThemedText style={styles.expPosition}>
+                    {exp.position}
+                  </ThemedText>
+                  <ThemedText style={styles.expCompany}>
+                    {exp.company}
+                  </ThemedText>
+                  {exp.location && (
+                    <ThemedText style={styles.expLocation}>
+                      {exp.location}
+                    </ThemedText>
+                  )}
+                  <ThemedText style={styles.expDate}>
+                    {exp.startDate} - {exp.endDate || "Present"}
+                  </ThemedText>
+                  {exp.description && (
+                    <ThemedText style={styles.expDescription}>
+                      {exp.description}
+                    </ThemedText>
+                  )}
                 </View>
               </View>
             ))}
@@ -305,30 +407,69 @@ const ViewProfile = () => {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Ionicons name="medal-outline" size={20} color={colors.text} />
-              <ThemedText style={styles.sectionTitle}>Certifications</ThemedText>
+              <ThemedText style={styles.sectionTitle}>
+                Certifications
+              </ThemedText>
             </View>
             {profile.certifications.map((cert, index) => (
-              <View key={cert.id || index} style={[styles.certCard, { backgroundColor: colors.backgroundSecondary }]}>
-                <View style={[styles.certIcon, { backgroundColor: colors.warning + '20' }]}>
+              <View
+                key={cert.id || index}
+                style={[
+                  styles.certCard,
+                  { backgroundColor: colors.backgroundSecondary },
+                ]}
+              >
+                <View
+                  style={[
+                    styles.certIcon,
+                    { backgroundColor: colors.warning + "20" },
+                  ]}
+                >
                   <Ionicons name="ribbon" size={24} color={colors.warning} />
                 </View>
                 <View style={styles.certContent}>
                   <ThemedText style={styles.certName}>{cert.name}</ThemedText>
-                  <ThemedText style={styles.certIssuer}>{cert.issuer}</ThemedText>
-                  {cert.issueDate && <ThemedText style={styles.certDate}>Issued: {cert.issueDate}</ThemedText>}
+                  <ThemedText style={styles.certIssuer}>
+                    {cert.issuer}
+                  </ThemedText>
+                  {cert.issueDate && (
+                    <ThemedText style={styles.certDate}>
+                      Issued: {cert.issueDate}
+                    </ThemedText>
+                  )}
                   {cert.credentialId && (
-                    <ThemedText style={styles.credentialId}>Credential ID: {cert.credentialId}</ThemedText>
+                    <ThemedText style={styles.credentialId}>
+                      Credential ID: {cert.credentialId}
+                    </ThemedText>
                   )}
                   {cert.fileUrl && (
-                    <TouchableOpacity 
-                      style={[styles.certFileLink, { backgroundColor: colors.primary + '15' }]} 
+                    <TouchableOpacity
+                      style={[
+                        styles.certFileLink,
+                        { backgroundColor: colors.primary + "15" },
+                      ]}
                       onPress={() => openUrl(cert.fileUrl)}
                     >
-                      <Ionicons name={cert.fileType === 'pdf' ? 'document-text' : 'image'} size={18} color={colors.primary} />
-                      <ThemedText style={[styles.certFileLinkText, { color: colors.primary }]}>
-                        View {cert.fileType === 'pdf' ? 'Certificate' : 'Image'}
+                      <Ionicons
+                        name={
+                          cert.fileType === "pdf" ? "document-text" : "image"
+                        }
+                        size={18}
+                        color={colors.primary}
+                      />
+                      <ThemedText
+                        style={[
+                          styles.certFileLinkText,
+                          { color: colors.primary },
+                        ]}
+                      >
+                        View {cert.fileType === "pdf" ? "Certificate" : "Image"}
                       </ThemedText>
-                      <Ionicons name="open-outline" size={14} color={colors.primary} />
+                      <Ionicons
+                        name="open-outline"
+                        size={14}
+                        color={colors.primary}
+                      />
                     </TouchableOpacity>
                   )}
                 </View>
@@ -341,41 +482,82 @@ const ViewProfile = () => {
         {profile.projects && profile.projects.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Ionicons name="code-slash-outline" size={20} color={colors.text} />
+              <Ionicons
+                name="code-slash-outline"
+                size={20}
+                color={colors.text}
+              />
               <ThemedText style={styles.sectionTitle}>Projects</ThemedText>
             </View>
             {profile.projects.map((project, index) => (
-              <View key={project.id || index} style={[styles.projectCard, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
-                <ThemedText style={styles.projectTitle}>{project.title}</ThemedText>
+              <View
+                key={project.id || index}
+                style={[
+                  styles.projectCard,
+                  {
+                    backgroundColor: colors.backgroundSecondary,
+                    borderColor: colors.border,
+                  },
+                ]}
+              >
+                <ThemedText style={styles.projectTitle}>
+                  {project.title}
+                </ThemedText>
                 {project.description && (
-                  <ThemedText style={styles.projectDesc}>{project.description}</ThemedText>
+                  <ThemedText style={styles.projectDesc}>
+                    {project.description}
+                  </ThemedText>
                 )}
                 {project.projectUrl && (
-                  <TouchableOpacity 
-                    style={styles.projectUrlLink} 
+                  <TouchableOpacity
+                    style={styles.projectUrlLink}
                     onPress={() => openUrl(project.projectUrl)}
                   >
-                    <Ionicons name="link-outline" size={16} color={colors.primary} />
-                    <ThemedText style={[styles.projectUrlText, { color: colors.primary }]}>
+                    <Ionicons
+                      name="link-outline"
+                      size={16}
+                      color={colors.primary}
+                    />
+                    <ThemedText
+                      style={[styles.projectUrlText, { color: colors.primary }]}
+                    >
                       View Project
                     </ThemedText>
                   </TouchableOpacity>
                 )}
                 {project.files && project.files.length > 0 && (
                   <View style={styles.projectFilesContainer}>
-                    <ThemedText style={styles.projectFilesLabel}>Attachments ({project.files.length})</ThemedText>
+                    <ThemedText style={styles.projectFilesLabel}>
+                      Attachments ({project.files.length})
+                    </ThemedText>
                     <View style={styles.projectFilesGrid}>
                       {project.files.map((file, fileIndex) => (
                         <TouchableOpacity
                           key={fileIndex}
-                          style={[styles.projectFileItem, { backgroundColor: colors.background }]}
+                          style={[
+                            styles.projectFileItem,
+                            { backgroundColor: colors.background },
+                          ]}
                           onPress={() => openUrl(file.url)}
                         >
-                          <Ionicons name={file.type === 'pdf' ? 'document-text' : 'image'} size={18} color={colors.primary} />
-                          <ThemedText style={styles.projectFileName} numberOfLines={1}>
+                          <Ionicons
+                            name={
+                              file.type === "pdf" ? "document-text" : "image"
+                            }
+                            size={18}
+                            color={colors.primary}
+                          />
+                          <ThemedText
+                            style={styles.projectFileName}
+                            numberOfLines={1}
+                          >
                             {file.name || `File ${fileIndex + 1}`}
                           </ThemedText>
-                          <Ionicons name="download-outline" size={14} color={colors.textSecondary} />
+                          <Ionicons
+                            name="download-outline"
+                            size={14}
+                            color={colors.textSecondary}
+                          />
                         </TouchableOpacity>
                       ))}
                     </View>
@@ -394,11 +576,19 @@ const ViewProfile = () => {
               <ThemedText style={styles.sectionTitle}>Achievements</ThemedText>
             </View>
             {profile.achievements.map((achievement, index) => (
-              <View 
-                key={index} 
-                style={[styles.achievementCard, { backgroundColor: colors.backgroundSecondary }]}
+              <View
+                key={index}
+                style={[
+                  styles.achievementCard,
+                  { backgroundColor: colors.backgroundSecondary },
+                ]}
               >
-                <View style={[styles.achievementIcon, { backgroundColor: colors.success + '20' }]}>
+                <View
+                  style={[
+                    styles.achievementIcon,
+                    { backgroundColor: colors.success + "20" },
+                  ]}
+                >
                   <Ionicons name="trophy" size={24} color={colors.success} />
                 </View>
                 <View style={styles.achievementContent}>
@@ -424,9 +614,13 @@ const ViewProfile = () => {
         {/* Empty State - Only show if no content */}
         {!hasContent && (
           <View style={styles.emptyState}>
-            <Ionicons name="person-outline" size={64} color={colors.textSecondary} />
+            <Ionicons
+              name="person-outline"
+              size={64}
+              color={colors.textSecondary}
+            />
             <ThemedText style={styles.emptyText}>
-              This profile doesn't have any content yet
+              This profile doesn&apos;t have any content yet
             </ThemedText>
           </View>
         )}
@@ -444,9 +638,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 16,
@@ -454,15 +648,15 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   scrollView: {
     flex: 1,
   },
   centerContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 40,
   },
   loadingText: {
@@ -472,14 +666,14 @@ const styles = StyleSheet.create({
   },
   errorTitle: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
     marginTop: 16,
     marginBottom: 8,
   },
   errorSubtitle: {
     fontSize: 14,
     opacity: 0.6,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 24,
   },
   retryButton: {
@@ -489,11 +683,11 @@ const styles = StyleSheet.create({
   },
   retryButtonText: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
   },
   profileHeader: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingTop: 32,
     paddingHorizontal: 20,
     paddingBottom: 24,
@@ -505,17 +699,17 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   profileImageText: {
     fontSize: 48,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
   },
   displayName: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 4,
   },
   username: {
@@ -524,8 +718,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
     marginBottom: 12,
   },
@@ -535,22 +729,22 @@ const styles = StyleSheet.create({
   },
   bio: {
     fontSize: 15,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 22,
     marginBottom: 12,
     opacity: 0.8,
   },
   websiteRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
   },
   website: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   statsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginHorizontal: 20,
     padding: 16,
     borderRadius: 16,
@@ -558,11 +752,11 @@ const styles = StyleSheet.create({
   },
   statItem: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   statValue: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 4,
   },
   statLabel: {
@@ -571,25 +765,25 @@ const styles = StyleSheet.create({
   },
   statDivider: {
     width: 1,
-    height: '100%',
+    height: "100%",
   },
   section: {
     paddingHorizontal: 20,
     marginBottom: 24,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   skillsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   skillChip: {
@@ -600,10 +794,10 @@ const styles = StyleSheet.create({
   },
   skillText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   experienceCard: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 14,
     borderRadius: 12,
     marginBottom: 12,
@@ -613,15 +807,15 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   expContent: {
     flex: 1,
   },
   expPosition: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   expCompany: {
@@ -645,7 +839,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   certCard: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 14,
     borderRadius: 12,
     marginBottom: 12,
@@ -655,15 +849,15 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   certContent: {
     flex: 1,
   },
   certName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   certIssuer: {
@@ -682,17 +876,17 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   certFileLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   certFileLinkText: {
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   projectCard: {
     padding: 16,
@@ -702,7 +896,7 @@ const styles = StyleSheet.create({
   },
   projectTitle: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 8,
   },
   projectDesc: {
@@ -712,21 +906,21 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   projectUrlLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     marginBottom: 12,
   },
   projectUrlText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   projectFilesContainer: {
     marginTop: 8,
   },
   projectFilesLabel: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     opacity: 0.7,
     marginBottom: 8,
   },
@@ -734,8 +928,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   projectFileItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
     padding: 12,
     borderRadius: 8,
@@ -745,7 +939,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   achievementCard: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 14,
     borderRadius: 12,
     marginBottom: 12,
@@ -755,15 +949,15 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   achievementContent: {
     flex: 1,
   },
   achievementTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   achievementDate: {
@@ -777,14 +971,14 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   emptyState: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 60,
     paddingHorizontal: 40,
   },
   messageButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginHorizontal: 20,
     paddingVertical: 14,
     borderRadius: 12,
@@ -792,13 +986,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   messageButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   emptyText: {
     fontSize: 15,
-    textAlign: 'center',
+    textAlign: "center",
     opacity: 0.6,
     marginTop: 16,
     lineHeight: 22,

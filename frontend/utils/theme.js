@@ -3,7 +3,7 @@
  * All theme values consolidated in one file
  */
 
-import { Platform } from 'react-native';
+import { Platform } from "react-native";
 
 // ==========================================
 // COLORS
@@ -16,110 +16,109 @@ import { Platform } from 'react-native';
 
 export const lightTheme = {
   // Primary colors - Vibrant blue-purple gradient feel
-  primary: '#6366F1', // Indigo
-  primaryLight: '#A5B4FC',
-  primaryDark: '#4338CA',
+  primary: "#6366F1", // Indigo
+  primaryLight: "#A5B4FC",
+  primaryDark: "#4338CA",
 
   // Accent colors
-  accent: '#8B5CF6', // Purple
-  accentLight: '#C4B5FD',
+  accent: "#8B5CF6", // Purple
+  accentLight: "#C4B5FD",
 
   // Background colors - Warm, modern feel
-  background: '#FFFFFF',
-  backgroundSecondary: '#F8FAFC',
-  backgroundTertiary: '#F1F5F9',
+  background: "#FFFFFF",
+  backgroundSecondary: "#F8FAFC",
+  backgroundTertiary: "#F1F5F9",
 
   // Text colors
-  text: '#0F172A',
-  textSecondary: '#64748B',
-  textTertiary: '#94A3B8',
-  textLink: '#6366F1',
+  text: "#0F172A",
+  textSecondary: "#64748B",
+  textTertiary: "#94A3B8",
+  textLink: "#6366F1",
 
   // Button text colors
-  buttonText: '#FFFFFF',
-  buttonTextSecondary: '#0F172A',
+  buttonText: "#FFFFFF",
+  buttonTextSecondary: "#0F172A",
 
   // Icon colors
-  icon: '#64748B',
-  iconActive: '#6366F1',
+  icon: "#64748B",
+  iconActive: "#6366F1",
 
   // Tab colors
-  tabBackground: '#FFFFFF',
-  tabIconDefault: '#94A3B8',
-  tabIconSelected: '#6366F1',
+  tabBackground: "#FFFFFF",
+  tabIconDefault: "#94A3B8",
+  tabIconSelected: "#6366F1",
 
   // Border colors
-  border: '#E2E8F0',
-  borderLight: '#F1F5F9',
+  border: "#E2E8F0",
+  borderLight: "#F1F5F9",
 
   // Status colors - Vibrant and modern
-  success: '#10B981', // Emerald
-  warning: '#F59E0B', // Amber
-  error: '#EF4444', // Red
-  info: '#3B82F6', // Blue
+  success: "#10B981", // Emerald
+  warning: "#F59E0B", // Amber
+  error: "#EF4444", // Red
+  info: "#3B82F6", // Blue
 
   // Utility
-  shadow: 'rgba(15, 23, 42, 0.08)',
-  overlay: 'rgba(15, 23, 42, 0.5)',
-  
+  shadow: "rgba(15, 23, 42, 0.08)",
+  overlay: "rgba(15, 23, 42, 0.5)",
+
   // Card colors
-  card: '#FFFFFF',
-  cardHover: '#F8FAFC',
+  card: "#FFFFFF",
+  cardHover: "#F8FAFC",
 };
 
 export const darkTheme = {
   // Primary colors - Vibrant on true black
-  primary: '#8B5CF6', // Indigo/Purple that pops on black
-  primaryLight: '#A78BFA',
-  primaryDark: '#5B21B6',
+  primary: "#8B5CF6", // Indigo/Purple that pops on black
+  primaryLight: "#A78BFA",
+  primaryDark: "#5B21B6",
 
   // Accent colors
-  accent: '#C4B5FD',
-  accentLight: '#A78BFA',
+  accent: "#C4B5FD",
+  accentLight: "#A78BFA",
 
   // Background colors - True black theme
-  background: '#000000',            // Pure black (AMOLED)
-  backgroundSecondary: '#0A0A0A',    // Near black
-  backgroundTertiary: '#121212',     // Material-style dark surface
+  background: "#000000", // Pure black (AMOLED)
+  backgroundSecondary: "#0A0A0A", // Near black
+  backgroundTertiary: "#121212", // Material-style dark surface
 
   // Text colors
-  text: '#FAFAFA',                   // Almost white (less eye strain)
-  textSecondary: '#B3B3B3',
-  textTertiary: '#8A8A8A',
-  textLink: '#8B5CF6',
+  text: "#FAFAFA", // Almost white (less eye strain)
+  textSecondary: "#B3B3B3",
+  textTertiary: "#8A8A8A",
+  textLink: "#8B5CF6",
 
   // Button text colors
-  buttonText: '#000000',
-  buttonTextSecondary: '#FAFAFA',
+  buttonText: "#000000",
+  buttonTextSecondary: "#FAFAFA",
 
   // Icon colors
-  icon: '#9CA3AF',
-  iconActive: '#8B5CF6',
+  icon: "#9CA3AF",
+  iconActive: "#8B5CF6",
 
   // Tab colors
-  tabBackground: '#000000',
-  tabIconDefault: '#6B7280',
-  tabIconSelected: '#8B5CF6',
+  tabBackground: "#000000",
+  tabIconDefault: "#6B7280",
+  tabIconSelected: "#8B5CF6",
 
   // Border colors
-  border: '#1F1F1F',
-  borderLight: '#141414',
+  border: "#1F1F1F",
+  borderLight: "#141414",
 
   // Status colors - Tuned for black background
-  success: '#22C55E',
-  warning: '#FACC15',
-  error: '#EF4444',
-  info: '#3B82F6',
+  success: "#22C55E",
+  warning: "#FACC15",
+  error: "#EF4444",
+  info: "#3B82F6",
 
   // Utility
-  shadow: 'rgba(0, 0, 0, 0.8)',
-  overlay: 'rgba(0, 0, 0, 0.85)',
+  shadow: "rgba(0, 0, 0, 0.8)",
+  overlay: "rgba(0, 0, 0, 0.85)",
 
   // Card colors
-  card: '#0F0F0F',
-  cardHover: '#1A1A1A',
+  card: "#0F0F0F",
+  cardHover: "#1A1A1A",
 };
-
 
 // ==========================================
 // FONTS
@@ -133,24 +132,25 @@ export const darkTheme = {
 export const fonts = Platform.select({
   ios: {
     /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
+    sans: "system-ui",
     /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
+    serif: "ui-serif",
     /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
+    rounded: "ui-rounded",
     /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
+    mono: "ui-monospace",
   },
   default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
+    sans: "normal",
+    serif: "serif",
+    rounded: "normal",
+    mono: "monospace",
   },
   web: {
     sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
     serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
+    rounded:
+      "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });
@@ -162,17 +162,17 @@ export const fontSizes = {
   base: 16,
   lg: 18,
   xl: 20,
-  '2xl': 24,
-  '3xl': 30,
-  '4xl': 36,
+  "2xl": 24,
+  "3xl": 30,
+  "4xl": 36,
 };
 
 // Font weights
 export const fontWeights = {
-  normal: '400',
-  medium: '500',
-  semibold: '600',
-  bold: '700',
+  normal: "400",
+  medium: "500",
+  semibold: "600",
+  bold: "700",
 };
 
 // Line heights
@@ -197,8 +197,8 @@ export const spacing = {
   md: 16,
   lg: 24,
   xl: 32,
-  '2xl': 48,
-  '3xl': 64,
+  "2xl": 48,
+  "3xl": 64,
 };
 
 // Border radius
@@ -247,7 +247,7 @@ export function createThemedStyles(stylesFn) {
  */
 export function getColorWithOpacity(color, opacity) {
   // Remove # if present
-  const hex = color.replace('#', '');
+  const hex = color.replace("#", "");
 
   // Parse RGB values
   const r = parseInt(hex.substring(0, 2), 16);
@@ -270,7 +270,7 @@ export function getColorWithOpacity(color, opacity) {
 export function createShadow(theme, elevation = 4) {
   if (elevation === 0) {
     return {
-      shadowColor: 'transparent',
+      shadowColor: "transparent",
       shadowOffset: { width: 0, height: 0 },
       shadowOpacity: 0,
       shadowRadius: 0,
@@ -300,8 +300,8 @@ export function createShadow(theme, elevation = 4) {
  * @returns {string} Interpolated hex color
  */
 export function interpolateColor(color1, color2, factor) {
-  const c1 = color1.replace('#', '');
-  const c2 = color2.replace('#', '');
+  const c1 = color1.replace("#", "");
+  const c2 = color2.replace("#", "");
 
   const r1 = parseInt(c1.substring(0, 2), 16);
   const g1 = parseInt(c1.substring(2, 4), 16);

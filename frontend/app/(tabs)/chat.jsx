@@ -1,19 +1,19 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useAuth } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
-import { subscribeToConversations } from '@/lib/chatService';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
+import { subscribeToConversations } from "@/lib/chatService";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Image,
   StyleSheet,
   TouchableOpacity,
-  View
-} from 'react-native';
+  View,
+} from "react-native";
 
 const Chat = () => {
   const { colors } = useTheme();
@@ -36,36 +36,39 @@ const Chat = () => {
   }, [user?.id]);
 
   const getOtherUser = (conversation) => {
-    const otherUserId = conversation.participants.find(p => p !== user?.id);
+    const otherUserId = conversation.participants.find((p) => p !== user?.id);
     return conversation.participantDetails?.[otherUserId] || {};
   };
 
   const formatTime = (timestamp) => {
-    if (!timestamp) return '';
+    if (!timestamp) return "";
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
     const now = new Date();
     const diff = now - date;
-    
+
     // Less than 24 hours
     if (diff < 86400000) {
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     }
     // Less than 7 days
     if (diff < 604800000) {
-      return date.toLocaleDateString([], { weekday: 'short' });
+      return date.toLocaleDateString([], { weekday: "short" });
     }
     // Older
-    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    return date.toLocaleDateString([], { month: "short", day: "numeric" });
   };
 
   const openChat = (conversation) => {
-    const otherUserId = conversation.participants.find(p => p !== user?.id);
+    const otherUserId = conversation.participants.find((p) => p !== user?.id);
     router.push({
-      pathname: '/(modals)/chat-room',
-      params: { 
+      pathname: "/(modals)/chat-room",
+      params: {
         conversationId: conversation.id,
-        otherUserId 
-      }
+        otherUserId,
+      },
     });
   };
 
@@ -75,15 +78,21 @@ const Chat = () => {
 
     return (
       <TouchableOpacity
-        style={[styles.conversationCard, { backgroundColor: colors.backgroundSecondary }]}
+        style={[
+          styles.conversationCard,
+          { backgroundColor: colors.backgroundSecondary },
+        ]}
         onPress={() => openChat(item)}
       >
         {otherUser.profileImage ? (
-          <Image source={{ uri: otherUser.profileImage }} style={styles.avatar} />
+          <Image
+            source={{ uri: otherUser.profileImage }}
+            style={styles.avatar}
+          />
         ) : (
           <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
             <ThemedText style={styles.avatarText}>
-              {otherUser.displayName?.charAt(0).toUpperCase() || 'U'}
+              {otherUser.displayName?.charAt(0).toUpperCase() || "U"}
             </ThemedText>
           </View>
         )}
@@ -91,18 +100,23 @@ const Chat = () => {
         <View style={styles.conversationInfo}>
           <View style={styles.conversationHeader}>
             <ThemedText style={styles.userName} numberOfLines={1}>
-              {otherUser.displayName || 'User'}
+              {otherUser.displayName || "User"}
             </ThemedText>
             <ThemedText style={styles.time}>
               {formatTime(item.lastMessageTime)}
             </ThemedText>
           </View>
           <ThemedText style={styles.lastMessage} numberOfLines={1}>
-            {isLastMessageMine && 'You: '}{item.lastMessage || 'Start a conversation'}
+            {isLastMessageMine && "You: "}
+            {item.lastMessage || "Start a conversation"}
           </ThemedText>
         </View>
 
-        <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+        <Ionicons
+          name="chevron-forward"
+          size={20}
+          color={colors.textSecondary}
+        />
       </TouchableOpacity>
     );
   };
@@ -111,7 +125,9 @@ const Chat = () => {
     <ThemedView style={styles.container}>
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <ThemedText type="title" style={styles.headerText}>Messages</ThemedText>
+        <ThemedText type="title" style={styles.headerText}>
+          Messages
+        </ThemedText>
       </View>
 
       {isLoading ? (
@@ -120,12 +136,22 @@ const Chat = () => {
         </View>
       ) : conversations.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <View style={[styles.emptyIcon, { backgroundColor: colors.backgroundSecondary }]}>
-            <Ionicons name="chatbubbles-outline" size={48} color={colors.primary} />
+          <View
+            style={[
+              styles.emptyIcon,
+              { backgroundColor: colors.backgroundSecondary },
+            ]}
+          >
+            <Ionicons
+              name="chatbubbles-outline"
+              size={48}
+              color={colors.primary}
+            />
           </View>
           <ThemedText style={styles.emptyTitle}>No messages yet</ThemedText>
           <ThemedText style={styles.emptySubtitle}>
-            Start a conversation by visiting someone's profile and tapping "Message"
+            Start a conversation by visiting someone&apos;s profile and tapping
+            &quot;Message&quot;
           </ThemedText>
         </View>
       ) : (
@@ -156,35 +182,35 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 40,
   },
   emptyIcon: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 20,
   },
   emptyTitle: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     opacity: 0.6,
     lineHeight: 20,
   },
@@ -192,8 +218,8 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   conversationCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 14,
     borderRadius: 12,
     marginBottom: 10,
@@ -202,27 +228,27 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   avatarText: {
     fontSize: 22,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
   },
   conversationInfo: {
     flex: 1,
     marginLeft: 12,
   },
   conversationHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 4,
   },
   userName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     flex: 1,
     marginRight: 8,
   },

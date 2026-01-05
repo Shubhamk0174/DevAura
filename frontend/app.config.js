@@ -1,20 +1,24 @@
 export default {
   expo: {
-    name: "TechSprint",
-    slug: "TechSprint",
+    name: "DevAura",
+    slug: "DevAura",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
-    scheme: "techsprint",
+    scheme: "DevAura",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
 
     ios: {
+      bundleIdentifier: "com.shubhamk0174.DevAura",
+      "infoPlist": {
+      "ITSAppUsesNonExemptEncryption": false
+    },
       supportsTablet: true,
     },
 
     android: {
-      package: "com.shubhamk0174.TechSprint",
+      package: "com.shubhamk0174.DevAura",
       adaptiveIcon: {
         backgroundColor: "#E6F4FE",
         foregroundImage: "./assets/images/android-icon-foreground.png",
@@ -52,7 +56,7 @@ export default {
     },
     extra: {
       eas: {
-        projectId: "6e980fa1-7421-4960-8751-e821abdbf67d"
+       projectId: "2ac03b53-bd11-433d-a31d-2e912c5f6cdb"
       },
       firebaseApiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
       firebaseAuthDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
