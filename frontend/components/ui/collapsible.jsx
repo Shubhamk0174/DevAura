@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { useState } from "react";
+import { StyleSheet, TouchableOpacity } from "react-native";
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useTheme } from '@/context/ThemeContext';
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTheme } from "@/context/ThemeContext";
 
 export function Collapsible({ children, title }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,13 +15,14 @@ export function Collapsible({ children, title }) {
       <TouchableOpacity
         style={styles.heading}
         onPress={() => setIsOpen((value) => !value)}
-        activeOpacity={0.8}>
+        activeOpacity={0.8}
+      >
         <IconSymbol
           name="chevron.right"
           size={18}
           weight="medium"
           color={colors.icon}
-          style={{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }}
+          style={{ transform: [{ rotate: isOpen ? "90deg" : "0deg" }] }}
         />
 
         <ThemedText type="defaultSemiBold">{title}</ThemedText>
@@ -33,8 +34,8 @@ export function Collapsible({ children, title }) {
 
 const styles = StyleSheet.create({
   heading: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
   },
   content: {

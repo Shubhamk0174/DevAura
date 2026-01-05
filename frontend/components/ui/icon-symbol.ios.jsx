@@ -1,11 +1,11 @@
-import { SymbolView } from 'expo-symbols';
+import { SymbolView } from "expo-symbols";
 
 export function IconSymbol({
   name,
   size = 24,
   color,
   style,
-  weight = 'regular',
+  weight = "regular",
 }) {
   return (
     <SymbolView

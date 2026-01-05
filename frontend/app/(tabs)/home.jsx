@@ -1,11 +1,11 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useAuth } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
-import { getFeaturedUsers } from '@/lib/firestoreService';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
+import { getFeaturedUsers } from "@/lib/firestoreService";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useEffect, useState, useCallback } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -14,8 +14,8 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  View
-} from 'react-native';
+  View,
+} from "react-native";
 
 const Home = () => {
   const { colors } = useTheme();
@@ -25,12 +25,12 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const result = await getFeaturedUsers(10);
       if (result.success) {
         // Filter out current user
-        const filtered = result.users.filter(u => u.id !== user?.id);
+        const filtered = result.users.filter((u) => u.id !== user?.id);
         setFeaturedUsers(filtered);
       }
     } catch (error) {
@@ -39,11 +39,11 @@ const Home = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [user?.id]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -52,27 +52,37 @@ const Home = () => {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 18) return 'Good Afternoon';
-    return 'Good Evening';
+    if (hour < 12) return "Good Morning";
+    if (hour < 18) return "Good Afternoon";
+    return "Good Evening";
   };
 
   const FeatureCard = ({ item }) => (
     <TouchableOpacity
-      style={[styles.featureCard, { backgroundColor: colors.backgroundSecondary }]}
-      onPress={() => router.push({
-        pathname: '/(modals)/view-profile',
-        params: { userId: item.id }
-      })}
+      style={[
+        styles.featureCard,
+        { backgroundColor: colors.backgroundSecondary },
+      ]}
+      onPress={() =>
+        router.push({
+          pathname: "/(modals)/view-profile",
+          params: { userId: item.id },
+        })
+      }
     >
       <Image
         source={item.profileImage ? { uri: item.profileImage } : null}
         style={[styles.featureImage, { backgroundColor: colors.primary }]}
       />
       {!item.profileImage && (
-        <View style={[styles.featureImagePlaceholder, { backgroundColor: colors.primary }]}>
+        <View
+          style={[
+            styles.featureImagePlaceholder,
+            { backgroundColor: colors.primary },
+          ]}
+        >
           <ThemedText style={styles.featureInitials}>
-            {item.displayName?.charAt(0).toUpperCase() || 'U'}
+            {item.displayName?.charAt(0).toUpperCase() || "U"}
           </ThemedText>
         </View>
       )}
@@ -81,7 +91,7 @@ const Home = () => {
           {item.displayName}
         </ThemedText>
         <ThemedText style={styles.featureRole} numberOfLines={1}>
-          {item.username ? `@${item.username}` : 'Member'}
+          {item.username ? `@${item.username}` : "Member"}
         </ThemedText>
       </View>
     </TouchableOpacity>
@@ -89,10 +99,13 @@ const Home = () => {
 
   const QuickAction = ({ icon, label, onPress, color }) => (
     <TouchableOpacity
-      style={[styles.actionCard, { backgroundColor: colors.backgroundSecondary }]}
+      style={[
+        styles.actionCard,
+        { backgroundColor: colors.backgroundSecondary },
+      ]}
       onPress={onPress}
     >
-      <View style={[styles.actionIcon, { backgroundColor: color + '20' }]}>
+      <View style={[styles.actionIcon, { backgroundColor: color + "20" }]}>
         <Ionicons name={icon} size={24} color={color} />
       </View>
       <ThemedText style={styles.actionLabel}>{label}</ThemedText>
@@ -112,21 +125,31 @@ const Home = () => {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+          />
         }
       >
         {/* Header Section */}
         <View style={styles.header}>
           <View>
             <ThemedText style={styles.greeting}>{getGreeting()},</ThemedText>
-            <ThemedText type="title">{user?.name?.split(' ')[0] || 'User'}</ThemedText>
+            <ThemedText type="title">
+              {user?.name?.split(" ")[0] || "User"}
+            </ThemedText>
           </View>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.profileButton, { borderColor: colors.border }]}
-            onPress={() => router.push('/(tabs)/profile')}
+            onPress={() => router.push("/(tabs)/profile")}
           >
-             {/* Show user avatar or icon */}
-             <Ionicons name="person-circle-outline" size={40} color={colors.text} />
+            {/* Show user avatar or icon */}
+            <Ionicons
+              name="person-circle-outline"
+              size={40}
+              color={colors.text}
+            />
           </TouchableOpacity>
         </View>
 
@@ -134,22 +157,22 @@ const Home = () => {
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Quick Actions</ThemedText>
           <View style={styles.actionsGrid}>
-            <QuickAction 
-              icon="search" 
-              label="Find People" 
-              onPress={() => router.push('/(tabs)/search')}
+            <QuickAction
+              icon="search"
+              label="Find People"
+              onPress={() => router.push("/(tabs)/search")}
               color="#4F46E5"
             />
-            <QuickAction 
-              icon="person" 
-              label="Edit Profile" 
-              onPress={() => router.push('/(modals)/edit-public-profile')}
+            <QuickAction
+              icon="person"
+              label="Edit Profile"
+              onPress={() => router.push("/(modals)/edit-public-profile")}
               color="#10B981"
             />
-             <QuickAction 
-              icon="chatbubbles" 
-              label="Messages" 
-              onPress={() => router.push('/(tabs)/chat')}
+            <QuickAction
+              icon="chatbubbles"
+              label="Messages"
+              onPress={() => router.push("/(tabs)/chat")}
               color="#F59E0B"
             />
           </View>
@@ -159,16 +182,18 @@ const Home = () => {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <ThemedText style={styles.sectionTitle}>Discover People</ThemedText>
-            <TouchableOpacity onPress={() => router.push('/(tabs)/search')}>
-              <ThemedText style={[styles.seeAll, { color: colors.primary }]}>See All</ThemedText>
+            <TouchableOpacity onPress={() => router.push("/(tabs)/search")}>
+              <ThemedText style={[styles.seeAll, { color: colors.primary }]}>
+                See All
+              </ThemedText>
             </TouchableOpacity>
           </View>
-          
+
           <FlatList
             horizontal
             data={featuredUsers}
             renderItem={({ item }) => <FeatureCard item={item} />}
-            keyExtractor={item => item.id}
+            keyExtractor={(item) => item.id}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.featuredList}
             ListEmptyComponent={
@@ -182,18 +207,25 @@ const Home = () => {
         {/* Recent Updates / Placeholder */}
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Community Updates</ThemedText>
-          <View style={[styles.updateCard, { backgroundColor: colors.backgroundSecondary }]}>
+          <View
+            style={[
+              styles.updateCard,
+              { backgroundColor: colors.backgroundSecondary },
+            ]}
+          >
             <View style={styles.updateHeader}>
               <Ionicons name="sparkles" size={20} color="#F59E0B" />
-              <ThemedText style={styles.updateTitle}>Welcome to TechSprint!</ThemedText>
+              <ThemedText style={styles.updateTitle}>
+                Welcome to DevAura!
+              </ThemedText>
             </View>
             <ThemedText style={styles.updateText}>
-              Connect with fellow developers, showcase your projects, and grow your network. 
-              Start by updating your profile and exploring the community.
+              Connect with fellow developers, showcase your projects, and grow
+              your network. Start by updating your profile and exploring the
+              community.
             </ThemedText>
           </View>
         </View>
-
       </ScrollView>
     </ThemedView>
   );
@@ -206,16 +238,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   center: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   scrollContent: {
     paddingBottom: 40,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 20,
@@ -234,34 +266,34 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     paddingHorizontal: 20,
     marginBottom: 16,
   },
   seeAll: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   featuredList: {
     paddingHorizontal: 15, // card margin is 5, so 15+5=20 padding
   },
-  
+
   // Feature Card
   featureCard: {
     width: 140,
     borderRadius: 16,
     padding: 12,
     marginHorizontal: 5,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -278,35 +310,35 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     marginBottom: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
     top: 12,
   },
   featureInitials: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   featureInfo: {
-    alignItems: 'center',
-    width: '100%',
+    alignItems: "center",
+    width: "100%",
   },
   featureName: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
-    textAlign: 'center',
+    textAlign: "center",
   },
   featureRole: {
     fontSize: 12,
     opacity: 0.6,
-    textAlign: 'center',
+    textAlign: "center",
   },
 
   // Actions
   actionsGrid: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: 15,
     gap: 10,
   },
@@ -314,20 +346,20 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     borderRadius: 16,
-    alignItems: 'center',
+    alignItems: "center",
     gap: 8,
   },
   actionIcon: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   actionLabel: {
     fontSize: 12,
-    fontWeight: '500',
-    textAlign: 'center',
+    fontWeight: "500",
+    textAlign: "center",
   },
 
   // Updates
@@ -337,14 +369,14 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   updateHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     marginBottom: 12,
   },
   updateTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   updateText: {
     fontSize: 14,
@@ -353,6 +385,6 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     padding: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
 });

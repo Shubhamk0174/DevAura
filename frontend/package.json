@@ -1,5 +1,5 @@
 {
-  "name": "techsprint",
+  "name": "DevAura",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -43,7 +43,9 @@
   },
   "devDependencies": {
     "eslint": "^9.25.0",
-    "eslint-config-expo": "~10.0.0"
+    "eslint-config-expo": "~10.0.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-plugin-import": "^2.32.0"
   },
   "private": true
 }

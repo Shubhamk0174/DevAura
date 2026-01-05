@@ -1,128 +1,149 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useAuth } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
-import { Link } from 'expo-router';
-import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
+import { Link } from "expo-router";
+import { useState } from "react";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 
 const Login = () => {
-  const { colors, spacing, borderRadius } = useTheme();
-  const { login, isLoading, error, clearError, resendVerificationEmail } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { colors } = useTheme();
+  const { login, error, clearError, resendVerificationEmail } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert("Error", "Please fill in all fields");
       return;
     }
 
+    setIsSubmitting(true);
     clearError();
     const result = await login(email, password);
+    setIsSubmitting(false);
 
     if (result.success) {
       // Auth state listener will handle navigation automatically
       // No manual redirect needed
     } else if (result.needsVerification) {
       Alert.alert(
-        'Email Not Verified',
-        'Please verify your email before logging in. Check your inbox for the verification link.',
+        "Email Not Verified",
+        "Please verify your email before logging in. Check your inbox for the verification link. If you don't see it, please check your spam folder.",
         [
-          { text: 'Cancel', style: 'cancel' },
-          { 
-            text: 'Resend Email', 
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Resend Email",
             onPress: async () => {
               const resendResult = await resendVerificationEmail();
               if (resendResult.success) {
-                Alert.alert('Success', resendResult.message);
+                Alert.alert("Success", resendResult.message);
               } else {
-                Alert.alert('Error', resendResult.error);
+                Alert.alert("Error", resendResult.error);
               }
-            }
+            },
           },
         ]
       );
     } else {
-      Alert.alert('Login Failed', error || result.error || 'Please try again');
+      Alert.alert("Login Failed", error || result.error || "Please try again");
     }
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={{ flex: 1 }} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ThemedView style={styles.container}>
-      <ThemedView style={styles.content}>
-        <ThemedText type="title" style={styles.title}>
-          Welcome Back
-        </ThemedText>
-        <ThemedText style={styles.subtitle}>
-          Sign in to your account
-        </ThemedText>
+        <ThemedView style={styles.content}>
+          <ThemedText type="title" style={styles.title}>
+            Welcome Back
+          </ThemedText>
+          <ThemedText style={styles.subtitle}>
+            Sign in to your account
+          </ThemedText>
 
-        <ThemedView style={styles.form}>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.backgroundSecondary,
-                borderColor: colors.border,
-                color: colors.text,
-              }
-            ]}
-            placeholder="Email"
-            placeholderTextColor={colors.textSecondary}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
+          <ThemedText
+            style={[styles.warning, { color: colors.warning }]}
+            type="defaultSemiBold"
+          >
+            Note: Verification email may be received in your spam folder.
+          </ThemedText>
 
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.backgroundSecondary,
-                borderColor: colors.border,
-                color: colors.text,
-              }
-            ]}
-            placeholder="Password"
-            placeholderTextColor={colors.textSecondary}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+          <ThemedView style={styles.form}>
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors.backgroundSecondary,
+                  borderColor: colors.border,
+                  color: colors.text,
+                },
+              ]}
+              placeholder="Email"
+              placeholderTextColor={colors.textSecondary}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors.backgroundSecondary,
+                  borderColor: colors.border,
+                  color: colors.text,
+                },
+              ]}
+              placeholder="Password"
+              placeholderTextColor={colors.textSecondary}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
 
             <TouchableOpacity
               style={[
                 styles.button,
                 { backgroundColor: colors.primary },
-                isLoading && { opacity: 0.6 }
+                isSubmitting && { opacity: 0.6 },
               ]}
               onPress={handleLogin}
-              disabled={isLoading}>
-              {isLoading ? (
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
                 <ActivityIndicator color={colors.buttonText} />
               ) : (
-                <ThemedText style={[styles.buttonText, { color: colors.buttonText }]}>
+                <ThemedText
+                  style={[styles.buttonText, { color: colors.buttonText }]}
+                >
                   Sign In
                 </ThemedText>
               )}
             </TouchableOpacity>
-        </ThemedView>
+          </ThemedView>
 
-        <ThemedView style={styles.footer}>
-          <ThemedText style={styles.footerText}>
-            Don't have an account?{' '}
-          </ThemedText>
-          <Link href="/register" style={styles.link}>
-            <ThemedText type="link">Sign Up</ThemedText>
-          </Link>
+          <ThemedView style={styles.footer}>
+            <ThemedText style={styles.footerText}>
+              Don&apos;t have an account?{" "}
+            </ThemedText>
+            <Link href="/register" style={styles.link}>
+              <ThemedText type="link">Sign Up</ThemedText>
+            </Link>
+          </ThemedView>
         </ThemedView>
-      </ThemedView>
       </ThemedView>
     </KeyboardAvoidingView>
   );
@@ -136,17 +157,22 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: 24,
   },
   title: {
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 8,
   },
   subtitle: {
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 32,
     opacity: 0.8,
+  },
+  warning: {
+    textAlign: "center",
+    marginBottom: 24,
+    fontSize: 14,
   },
   form: {
     gap: 16,
@@ -161,18 +187,18 @@ const styles = StyleSheet.create({
   button: {
     height: 50,
     borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 8,
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 24,
   },
   footerText: {
